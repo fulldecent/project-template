@@ -22,7 +22,7 @@ Use a more specific template if it applies. These all conform to this project te
 - [Swift 6 module template](https://github.com/fulldecent/swift6-module-template): reusable Swift 6 module (e.g. with Swift Package Manager)
 - [Solidity template](https://github.com/fulldecent/solidity-template): Solidity contracts (technology preview)
 - [Moodle plugin template](https://github.com/fulldecent/moodle-local_plugin_template): Moodle plugin (work in progress)
-- [Podcast template](https://github.com/fulldecent/podcast-template): Podcast on your own domain
+- [Podcast template](https://github.com/fulldecent/podcast-template): podcast on your own domain
 
 ## Maintenance and dependency updates
 
