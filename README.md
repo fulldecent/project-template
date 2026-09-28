@@ -34,5 +34,5 @@ Do this every month or so and please send a PR here if you see updates available
 
 1. We include a GitHub Action for validating file format but do not provide instructions to automate that formatting. Your own project may wish to do that if people developing your project are comfortable using the command line and installing packages.
 1. We use title case for titles and proper nouns; not for headings and things. This includes our README above as well as our workflow rules and other configuration files. If you have a different policy, then please implement it throughout.
-1. We use an MIT license for this project. You should carefully consider which license to apply to your own project.
+1. We use an MIT license for this template. You should carefully consider which license to apply to your own project.
 1. This project is built based on [best practices documented in project-template](https://github.com/fulldecent/project-template), release 1.0.0.
