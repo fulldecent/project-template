@@ -3,7 +3,7 @@
 [![Lint](https://github.com/fulldecent/project-template/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/fulldecent/project-template/actions/workflows/lint.yml)
 
 > [!IMPORTANT]
-> Replace this top heading with your own project name and status badge, and replace the rest of this section with what the project does, and way to show it (e.g. screenshots).
+> Replace this top heading with your own project name and status badge, and replace the rest of this section with what the project does, and show it (e.g. with screenshots).
 >
 > This template does not include "try it out", "usage", "development" and "release" sections because each project should decide which, if any, of these apply. We include a GitHub Action workflow for continuous integration of file formatting but do not provide instructions for running that ad-hoc. Your own project may wish to add such instructions if your audience is comfortable using the command line and installing packages.
 
@@ -17,7 +17,7 @@ This is an opinionated template for every project, unless a more specific templa
 
 ## More specific templates
 
-Use a more specific template if it applies. These all conform to this project template and provide additional features:
+Use a more specific template if it applies. These all provide additional features:
 
 - [Node.js template](https://github.com/fulldecent/node.js-template): Node.js module (e.g. on NPM) or application
 - [GitHub Pages template](https://github.com/fulldecent/github-pages-template): collaboratively edited HTML websites
@@ -33,11 +33,11 @@ Use a more specific template if it applies. These all conform to this project te
 >
 > After that, add your project's scope. This tells people what kinds of things you care about. This inspires people to become *contributors* here when they are doing their own work and see that their work is also welcome here.
 >
-> Last, it is good to also say what is out-of-scope. These exclusions serve the same purpose and demonstrate that you thoughtful about your scoping.
+> Last, it is good to also say what is out-of-scope. These exclusions serve the same purpose and demonstrate that you are thoughtful about your scoping.
 
 We the people who manage projects, in order to surface up records of past decisions and make projects inviting for a growing audience, maintain this starting point for all projects.
 
-This project-template must remain broad—addressing the needs of many kinds of projects. This includes projects related to compiling code as well as others. Every project deserves a README, and a clear rule on basic formatting question, this is why we include continuous integration linting.
+This project-template must remain broad—addressing the needs of many kinds of projects. This includes projects related to compiling code as well as others. Every project deserves a README, and a clear rule on basic formatting questions, this is why we include continuous integration linting.
 
 This project-template does not address items which only apply to projects involving compiling source code. We do not specify that GitHub and GitHub Actions are the only way to host projects, others may consider our GitHub-specific notes as a starting point guide.
 
@@ -50,11 +50,13 @@ Every quarter we should check these things. Please send a PR if you see updates 
 ## References
 
 > [!IMPORTANT]
-> We use an MIT license for this template. You should carefully consider which license to apply to your own project.
+> We use an MIT license for this template. You should carefully consider which license to apply to your own project. Replace the copyright line in LICENSE.
 >
 > If your project materially relied on external sources to make some decisions, cite them here.
 >
 > We cite a text formatting policy below. This applies to our README above as well as our workflow rules and other configuration files. If you have a different policy, then please implement it throughout.
+>
+> We cite the project-template release you copied.
 
 1. We use title case for titles and proper nouns; not for headings and other things.
-1. This project is built based on [best practices documented in project-template](https://github.com/fulldecent/project-template), release 1.1.0.
+1. This project is built based on [best practices documented in project-template](https://github.com/fulldecent/project-template), release 1.1.1.
