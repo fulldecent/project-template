@@ -7,6 +7,9 @@ on:
     # Runs on all pull requests targeting any branch
     branches: ["**"]
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Prettier & Markdownlint
@@ -16,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup Node.js (Tool Runtime)
+      - name: Setup Node.js (tool runtime)
         uses: actions/setup-node@v7
         with:
           node-version: "lts/*" # Floating version is appropriate specifically for Prettier and markdownlint
