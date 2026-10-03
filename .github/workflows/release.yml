@@ -1,0 +1,133 @@
+# Release
+#
+# One workflow. It opens the release pull request, and on the merge it builds, attests, and publishes.
+#
+# A separate tag workflow cannot do the publish step. The default token creates the tag, and events from
+# that token do not start other workflows. The build and the publish have to be later jobs in this run.
+#
+# What it does
+#   Push to main opens or updates the release pull request from conventional commits.
+#   release-type simple reads the latest GitHub Release. No config file. Tags look like v1.2.3.
+#   The pull request step does not publish. A published release cannot gain files after the immutable
+#   setting is on, so the files have to be in the call that publishes.
+#   After that pull request is merged, this run calls Build and test, then publishes that artifact.
+#   A hand run with a tag publishes that tag from the commit you selected. A hand run with no tag only
+#   opens or updates the pull request.
+#
+# What it consumes from Build and test
+#   1. $.jobs.build-test
+#   2. artifact name build-test
+#      The artifact is the files that were in dist/, not a folder named dist. This workflow downloads
+#      them into dist/ so the publish call has one directory.
+#
+# One-time setup
+#   Settings, then Releases, then Enable release immutability.
+#   Settings, then Actions, then General, then Workflow permissions: Read and write permissions.
+#   Public repositories can attest on every current plan. Private and internal repositories need
+#   GitHub Enterprise Cloud.
+#
+# The release pull request will not run Lint. The token that opens it does not start workflows.
+#
+# Check a published file:
+#   gh release verify OWNER/REPO v1.2.3
+#   gh attestation verify ./hello.txt -R OWNER/REPO
+#
+name: Release
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to publish, for example v1.2.3. Leave empty to open or update the release pull request only.
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  propose:
+    name: Open or update the release pull request
+    if: github.event_name == 'push' || inputs.tag == ''
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      sha: ${{ steps.release.outputs.sha }}
+    steps:
+      # skip-github-release keeps the tag and the GitHub release for the publish job.
+      # The action still sets release_created, tag_name, and sha when the pull request is merged.
+      - name: Open the release pull request
+        id: release
+        uses: googleapis/release-please-action@v5
+        with:
+          release-type: simple
+          skip-github-release: true
+
+  build-test:
+    name: Build and test
+    needs: propose
+    if: |
+      always() &&
+      (needs.propose.result == 'success' || needs.propose.result == 'skipped') &&
+      (needs.propose.outputs.release_created == 'true' ||
+       (github.event_name == 'workflow_dispatch' && inputs.tag != ''))
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    uses: ./.github/workflows/build-test.yml
+
+  publish:
+    name: Publish release
+    needs: [propose, build-test]
+    if: |
+      always() &&
+      needs.build-test.result == 'success' &&
+      (needs.propose.outputs.release_created == 'true' ||
+       (github.event_name == 'workflow_dispatch' && inputs.tag != ''))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download the build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-test
+          path: dist
+
+      - name: Resolve the tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.tag }}" ]; then
+            tag="${{ inputs.tag }}"
+            sha="${GITHUB_SHA}"
+          else
+            tag="${{ needs.propose.outputs.tag_name }}"
+            sha="${{ needs.propose.outputs.sha }}"
+          fi
+          case "$tag" in
+            v*.*.*) ;;
+            *) echo "tag must look like v1.2.3" >&2; exit 1 ;;
+          esac
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+          SHA: ${{ steps.tag.outputs.sha }}
+        run: |
+          # One call, files included. A later upload fails once release immutability is on.
+          gh release create "$TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$SHA" \
+            --title "$TAG" \
+            --generate-notes \
+            --latest
