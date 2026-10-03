@@ -1,38 +1,21 @@
 # Build and test
 #
-# This file is disabled. A push will not run it, and it will not use minutes.
+# This runs: automatic builds, SLSA attestation and tests on each push; and immutable releases connected to builds.
 #
-# When you enable it you get: automatic builds, SLSA attestation and tests on each push; and immutable releases
-# connected to these builds.
-#
-# When you are ready for this to run on its own:
-#   1. Update the build and test steps below to actually build and test your project.
-#   2. Go to GitHub repo > Settings > General > Releases > Enable release immutability and turn it on.
-#   3. Uncomment the push and pull_request blocks.
-#   4. Delete the push.branches-ignore block.
+# Update the build and test steps below for your own project.
 #
 # This workflow produces the following things which release.yml consumes:
-#   1. $.jobs.build-test (this job ID)
-#   2. build-test artifact name (in actions/upload-artifact step)
-#
-# Verify any build artifacts and attestations produced by this workflow:
-#   gh attestation verify dist/hello.txt -R OWNER/REPO
-#   gh attestation verify ./hello.txt -R OWNER/REPO
+#   1. $.jobs.build-test (this exact job ID)
+#   2. build artifact name (in actions/upload-artifact step)
 
 name: Build and test
 
 on:
   workflow_call:
-
-  # push:
-  #   branches:
-  #     - main
-  # pull_request:
-
-  # Disabled. Delete this block when you uncomment the triggers above.
   push:
-    branches-ignore:
-      - "**"
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build-test:
@@ -51,12 +34,12 @@ jobs:
         run: |
           # Replace this with the real build. Keep the output in dist/.
           mkdir -p dist
-          printf 'commit %s\n' "${GITHUB_SHA}" > dist/hello.txt
+          cp README.md dist/
 
       - name: Test
         run: |
           # Replace this with the real test command.
-          test -s dist/hello.txt
+          test -s dist/README.md
 
       - name: Attest the build
         uses: actions/attest@v4
@@ -66,7 +49,7 @@ jobs:
       - name: Upload the build
         uses: actions/upload-artifact@v4
         with:
-          name: build-test
+          name: build
           path: dist/
           if-no-files-found: error
           retention-days: 14
