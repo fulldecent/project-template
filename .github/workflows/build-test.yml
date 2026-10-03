@@ -1,12 +1,14 @@
 # Build and test
 #
-# This runs: automatic builds, SLSA attestation and tests on each push; and immutable releases connected to builds.
+# Build, SLSA attest, and test the project.
 #
-# Update the build and test steps below for your own project.
+# TODO: Update the build and test steps below for your own project.
 #
 # This workflow produces the following things which release.yml consumes:
 #   1. $.jobs.build-test (this exact job ID)
-#   2. build artifact name (in actions/upload-artifact step)
+#   2. The artifact named "build"
+#
+# Public repositories can use attest for free. Private repos require Enterprise Cloud.
 
 name: Build and test
 
@@ -42,9 +44,16 @@ jobs:
           test -s dist/README.md
 
       - name: Attest the build
+        id: attest
         uses: actions/attest@v4
         with:
           subject-path: dist/*
+
+      # After attesting, so the bundle is not one of its own subjects.
+      - name: Add the attestation to the build
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: cp "$BUNDLE" dist/attestation.sigstore.json
 
       - name: Upload the build
         uses: actions/upload-artifact@v4

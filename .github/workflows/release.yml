@@ -1,35 +1,23 @@
 # Release
 #
-# One workflow. It opens the release pull request, and on the merge it builds, attests, and publishes.
+# Open/update the release pull request; build and test the project; and publish the release.
 #
-# A separate tag workflow cannot do the publish step. The default token creates the tag, and events from that token do
-# not start other workflows. The build and the publish have to be later jobs in this run.
-#
-# What it does
-#   Push to main opens or updates the release pull request from conventional commits. release-type simple reads the
-#   latest GitHub Release. No config file. Tags look like v1.2.3. The pull request step does not publish. A published
-#   release cannot gain files after the immutable setting is on, so the files have to be in the call that publishes.
-#   After that pull request is merged, this run calls Build and test, then publishes that artifact. A hand run with a
-#   tag publishes that tag from the commit you selected. A hand run with no tag only opens or updates the pull request.
-#
-# What it consumes from Build and test
-#   1. $.jobs.build-test
-#   2. artifact name build
-#      The artifact is the files that were in dist/, not a folder named dist. This workflow downloads them into dist/ so
-#      the publish call has one directory.
+# This workflow consumes the following from build-test.yml:
+#   1. $.jobs.build-test (this exact job ID)
+#   2. The artifact named "build"
 #
 # One-time setup
 #   1. Go to GitHub repo > Settings > General > Releases > Enable release immutability.
 #   2. Go to GitHub repo > Settings > Actions > General > Workflow permissions: Read and write permissions.
 #
-# Public repositories can attest on every current plan. Private and internal repositories need GitHub Enterprise Cloud.
-#
-# The release pull request will not run Lint. The token that opens it does not start workflows.
+# Public repositories can use attest for free. Private repos require Enterprise Cloud.
 #
 # Check a published file:
 #   gh release verify OWNER/REPO v1.2.3
 #   gh attestation verify ./README.md -R OWNER/REPO
-#
+#   gh attestation verify ./README.md -R OWNER/REPO --bundle ./release.sigstore.jsonl
+#   gh attestation verify ./README.md -R OWNER/REPO --bundle ./release.sigstore.jsonl --predicate-type urn:version
+
 name: Release
 
 on:
@@ -53,18 +41,29 @@ jobs:
     if: github.event_name == 'push' || inputs.tag == ''
     runs-on: ubuntu-latest
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
-      sha: ${{ steps.release.outputs.sha }}
+      pr: ${{ steps.merged.outputs.pr }}
+      tag_name: ${{ steps.merged.outputs.tag_name }}
     steps:
-      # skip-github-release keeps the tag and the GitHub release for the publish job.
-      # The action still sets release_created, tag_name, and sha when the pull request is merged.
       - name: Open the release pull request
-        id: release
         uses: googleapis/release-please-action@v5
         with:
           release-type: simple
           skip-github-release: true
+
+      - name: Find a merged release pull request
+        id: merged
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          found=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '
+            .[] | select(.merged_at != null and any(.labels[]; .name == "autorelease: pending"))
+            | "\(.number) v\(.title | capture("release (?<v>[0-9]+[.][0-9]+[.][0-9]+)").v)"' | head -n 1)
+          if [ -n "$found" ]; then
+            read -r pr tag <<< "$found"
+            echo "pr=$pr" >> "$GITHUB_OUTPUT"
+            echo "tag_name=$tag" >> "$GITHUB_OUTPUT"
+          fi
 
   build-test:
     name: Build and test
@@ -72,7 +71,7 @@ jobs:
     if: |
       always() &&
       (needs.propose.result == 'success' || needs.propose.result == 'skipped') &&
-      (needs.propose.outputs.release_created == 'true' ||
+      (needs.propose.outputs.tag_name != '' ||
        (github.event_name == 'workflow_dispatch' && inputs.tag != ''))
     permissions:
       contents: read
@@ -87,11 +86,14 @@ jobs:
     if: |
       always() &&
       needs.build-test.result == 'success' &&
-      (needs.propose.outputs.release_created == 'true' ||
+      (needs.propose.outputs.tag_name != '' ||
        (github.event_name == 'workflow_dispatch' && inputs.tag != ''))
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
+      id-token: write
+      attestations: write
     steps:
       - name: Download the build
         uses: actions/download-artifact@v4
@@ -99,33 +101,67 @@ jobs:
           name: build
           path: dist
 
+      # Out of dist/ so the version attestation does not take it as a subject.
+      - name: Set the provenance bundle aside
+        run: mv dist/attestation.sigstore.json "$RUNNER_TEMP/provenance.sigstore.json"
+
       - name: Resolve the tag
         id: tag
+        env:
+          TAG: ${{ inputs.tag || needs.propose.outputs.tag_name }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.tag }}" ]; then
-            tag="${{ inputs.tag }}"
-            sha="${GITHUB_SHA}"
-          else
-            tag="${{ needs.propose.outputs.tag_name }}"
-            sha="${{ needs.propose.outputs.sha }}"
-          fi
-          case "$tag" in
+          case "$TAG" in
             v*.*.*) ;;
             *) echo "tag must look like v1.2.3" >&2; exit 1 ;;
           esac
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Attest the version
+        id: version
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/*
+          predicate-type: urn:version
+          predicate: ${{ format('{{"version":"{0}"}}', steps.tag.outputs.version) }}
+
+      # dist/* was already attested. Write the sidecar after, so it is not a subject.
+      - name: Write the sidecar
+        env:
+          VERSION_BUNDLE: ${{ steps.version.outputs.bundle-path }}
+        run: |
+          jq -c . "$RUNNER_TEMP/provenance.sigstore.json" > dist/release.sigstore.jsonl
+          jq -c . "$VERSION_BUNDLE" >> dist/release.sigstore.jsonl
+
+      - name: Check the sidecar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in dist/*; do
+            [ "$f" = dist/release.sigstore.jsonl ] && continue
+            gh attestation verify "$f" -R "$GITHUB_REPOSITORY" --bundle dist/release.sigstore.jsonl
+            gh attestation verify "$f" -R "$GITHUB_REPOSITORY" --bundle dist/release.sigstore.jsonl \
+              --predicate-type urn:version
+          done
 
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.tag.outputs.tag }}
-          SHA: ${{ steps.tag.outputs.sha }}
         run: |
           # One call, files included. A later upload fails once release immutability is on.
           gh release create "$TAG" dist/* \
             --repo "$GITHUB_REPOSITORY" \
-            --target "$SHA" \
+            --target "$GITHUB_SHA" \
             --title "$TAG" \
             --generate-notes \
             --latest
+
+      - name: Mark the release pull request tagged
+        if: needs.propose.outputs.pr != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ needs.propose.outputs.pr }}
+        run: |
+          gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$PR/labels/autorelease:%20pending"
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR/labels" -f "labels[]=autorelease: tagged"
