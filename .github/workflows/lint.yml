@@ -30,4 +30,4 @@ jobs:
 
       - name: Check Markdown (markdownlint)
         # Command fails if any markdown files do not meet the linting rules.
-        run: npx markdownlint-cli@latest "**/*.md" --ignore "node_modules"
+        run: npx markdownlint-cli@latest "**/*.md"

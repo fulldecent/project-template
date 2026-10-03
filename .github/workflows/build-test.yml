@@ -1,7 +1,7 @@
 # Build and test
 #
 # This file is disabled. A push will not run it, and it will not use minutes.
-# 
+#
 # When you enable it you get: automatic builds, SLSA attestation and tests on each push; and immutable releases
 # connected to these builds.
 #
@@ -32,7 +32,7 @@ on:
   # Disabled. Delete this block when you uncomment the triggers above.
   push:
     branches-ignore:
-      - '**'
+      - "**"
 
 jobs:
   build-test:
