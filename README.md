@@ -7,6 +7,9 @@
 >
 > This template does not include "try it out", "installation", "usage" or "development/contributing" sections because each project should decide which, if any, of these apply. We include a GitHub Action workflow for continuous integration of file formatting but do not provide instructions for running that ad-hoc. Your own project may wish to add such instructions to your development/contributing section if your audience is comfortable using the command line and installing packages.
 
+> [!NOTE]
+> The main readme has sections set in an intentional order.
+
 This is an opinionated template for every project, unless a more specific template applies, that provides:
 
 - An explicit license (MIT, at [LICENSE](LICENSE))
@@ -27,6 +30,44 @@ Use a more specific template if it applies. These all provide additional feature
 - [Solidity template](https://github.com/fulldecent/solidity-template): Solidity contracts (technology preview)
 - [Moodle plugin template](https://github.com/fulldecent/moodle-local_plugin_template): Moodle plugin (work in progress)
 - [Podcast template](https://github.com/fulldecent/podcast-template): podcast on your own domain
+
+## Try it first
+
+> [!IMPORTANT]
+>
+> If you have a web demo or playground (no install required), show that here. If not, delete this section.
+>
+> This allows visitors to quickly see and feel how your project connects with their needs and starts them thinking about its value proposition.
+
+## Installation
+
+> [!IMPORTANT]
+> If your project requires some installation process to use it, explain that here. If not, delete this section.
+>
+> Other common names for this section include: getting started, setup.
+
+> [!TIP]
+> Please consider that people using your project may not care about the technology you build it on. That means explaining those technologies (at least their setup) is in-scope for your project setup instructions.
+>
+> Examples:
+>
+> | You offer...                                          | Your audience...     | Your install section should...                               | Your development section should...                           |
+> | ----------------------------------------------------- | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+> | A QR code scanner built using Node.js                 | Not have Node.js     | Explain how to set up an acceptable version of Node.js. Or show a binary version with static linking. | Explain how to setup the correct version of Node.js.         |
+> | A QR code scanner library using Node.js (with no CLI) | Must know of Node.js | Explain how to set up an acceptable version of Node.js.      | Explain how to setup the correct version of Node.js.         |
+> | A mobile phone app                                    | Has a mobile phone   | Show how to get the pubilshed app binary from the canonical phone app store or other location. | Explain how to setup the correct version of development tools. |
+> | A website                                             | Has a web browser    | (This may not apply.)                                        | Explain how to setup the correct version of development tools. |
+>
+> For your install section, for example, if your product supports all stable versions of Node.js, then you just need to say "install a stable version of Node.js", and preferably include instructions for the major operating systems your audience may use.
+>
+> Some technologies have offensive install instructions, like the Rust project's `curl | sh` recommendation. You should avoid linking to those websites and invest the time to make better instructions.
+
+## Development
+
+> [!IMPORTANT]
+> If your project requires some installation process to use it, explain that here. If not, delete this section.
+>
+> Other common names for this section include: contributing, get involved. It is a higher level of commitment than just using your product.
 
 ## Project scope
 
