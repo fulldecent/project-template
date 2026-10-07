@@ -27,7 +27,7 @@
 >
 > And now below is the template, shown for a specific hypothetical project, enjoy!
 
-[![Lint](https://github.com/fulldecent/project-template/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/fulldecent/project-template/actions/workflows/lint.yml)
+[![Lint](https://github.com/fulldecent/project-template/actions/workflows/lint.yml/badge.svg)](https://github.com/fulldecent/project-template/actions/workflows/lint.yml) [![Build and test](https://github.com/fulldecent/project-template/actions/workflows/build-test.yml/badge.svg)](https://github.com/fulldecent/project-template/actions/workflows/build-test.yml)
 
 Fresh fruit, sold on the corner. Cups, prices, and hours are on the stand.
 
