@@ -5,7 +5,7 @@
 >
 > * Clear structure and quick notes
 > * Continuous integration to [check formatting](.github/workflows/lint.yml)
-> * Automated releases with [Release Please](.github/workflows/release-please.yml) and SLSA provenance attestation
+> * Automated releases with [Release Please](.github/workflows/release.yml) and SLSA provenance attestation
 > * Modern [EditorConfig](.editorconfig), [.gitignore](.gitignore) and linting
 >
 > If a more specific template applies, use that instead:
