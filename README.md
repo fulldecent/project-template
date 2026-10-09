@@ -168,7 +168,7 @@ We specifically will not adopt any changes that require power tools for building
 1. This project is released under the [MIT license](./LICENSE.md).
 
 > [!NOTE]
-> We use an MIT license for this template. You should carefully consider which license to apply to your own project. Replace the copyright line in LICENSE.
+> We use an MIT license for this template. You should carefully consider which license to apply to your own project. Replace the copyright line in LICENSE.md.
 >
 > We cite a non-existent style guide here. You may add one or add your own rules, to achieve a consistent voice even with diverse contributors.
 >
