@@ -164,7 +164,7 @@ We specifically will not adopt any changes that require power tools for building
 ## References
 
 1. We use "Title Case" only for proper nouns, this includes the name of our project. We have a separate style guide for other word choice and typography decisions we have settled on.
-1. This project is built based on [best practices documented in project-template](https://github.com/fulldecent/project-template), release 1.2.0.
+1. This project is built based on [best practices documented in project-template](https://github.com/fulldecent/project-template), release v1.3.0.
 1. This project is released under the [MIT license](./LICENSE.md).
 
 > [!NOTE]
