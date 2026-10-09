@@ -119,7 +119,7 @@ Use `fix:`, `feat:` or `BREAKING CHANGE:`  in your commit messages. This will tr
 > [!NOTE]
 > In your GitHub repository settings, under Actions, General, Workflow permissions, check "Allow GitHub Actions to create and approve pull requests". Release Please needs this to open the release draft pull request.
 >
-> A repository created from this template starts with no tags and no releases. Release Please reads the latest tag on the default branch to choose the next version. A repository with no tag gets a first release pull request for 1.0.0. The publish job accepts a tag shaped like `v1.2.3`.
+> A repository created from this template starts with no tags and no releases. Release Please reads the latest tag on the default branch to choose the next version. The publish job accepts a tag shaped like `v1.2.3`.
 >
 > Run these commands from a clone of the new repository. `gh` fills in `{owner}/{repo}` from that clone.
 >
