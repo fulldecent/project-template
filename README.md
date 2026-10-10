@@ -13,6 +13,7 @@
 > * [Node.js template](https://github.com/fulldecent/node.js-template): Node.js modules (e.g. on NPM) and applications
 > * [GitHub Pages template](https://github.com/fulldecent/github-pages-template): collaboratively-edited HTML websites
 > * [Swift 6 module template](https://github.com/fulldecent/swift6-module-template): reusable Swift 6 modules
+> * [Swift app template](https://github.com/fulldecent/swift-app-template): Xcode apps, including TestFlight and App Store review
 > * [Solidity template](https://github.com/fulldecent/solidity-template): Solidity contracts (technology preview)
 > * [Moodle plugin template](https://github.com/fulldecent/moodle-local_plugin_template): Moodle plugin (work in progress)
 > * [Podcast template](https://github.com/fulldecent/podcast-template): podcast on your own domain
