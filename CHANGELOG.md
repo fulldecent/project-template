@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/fulldecent/project-template/compare/v1.4.0...v1.4.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* make Release Please notes not too verbose ([5bdb453](https://github.com/fulldecent/project-template/commit/5bdb4534276f4148db9d1f19bd11053662f7d2dc))
+
 ## [1.4.0](https://github.com/fulldecent/project-template/compare/v1.3.0...v1.4.0) (2026-10-10)
 
 
