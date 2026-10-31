@@ -115,30 +115,12 @@ npx markdownlint-cli@latest "**/*.md" --fix
 
 ### Releases
 
-Use `fix:`, `feat:` or `BREAKING CHANGE:`  in your commit messages. This will trigger our bot to make a new "release draft" pull request. Merging that pull request triggers a new tag and GitHub Release.
+Use `fix:`, `feat:` or `BREAKING CHANGE:`  prefixes in your commit messages. This will trigger our bot to make a new "release draft" pull request. Merging that pull request triggers a new tag and GitHub Release.
 
 > [!NOTE]
 > In your GitHub repository settings, under Actions, General, Workflow permissions, check "Allow GitHub Actions to create and approve pull requests". Release Please needs this to open the release draft pull request.
 >
-> A repository created from this template starts with no tags and no releases. Release Please reads the latest tag on the default branch to choose the next version. The publish job accepts a tag shaped like `v1.2.3`.
->
-> Run these commands from a clone of the new repository. `gh` fills in `{owner}/{repo}` from that clone.
->
-> List tags:
->
-> ```sh
-> gh api repos/{owner}/{repo}/tags --jq '.[].name'
-> ```
->
-> Set the starting tag on the current `main` commit. `v0.0.0` is the version Release Please counts forward from. Use another `vMAJOR.MINOR.PATCH` tag when this repository should start later.
->
-> ```sh
-> gh api --method POST repos/{owner}/{repo}/git/refs \
->   -f ref="refs/tags/v0.0.0" \
->   -f sha="$(gh api repos/{owner}/{repo}/commits/main --jq .sha)"
-> ```
->
-> `gh release list` and `gh release create` publish the releases this workflow creates after that tag.
+> If you are adopting this template from an existing project and your first Release Please PR is not getting the version number right, check the Release Please documentation—you may need to add a configuration option if you do not use a "v" prefix in your release tag names, and for other situations.
 
 ### Maintenance
 
